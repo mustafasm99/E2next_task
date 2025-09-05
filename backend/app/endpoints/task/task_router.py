@@ -2,11 +2,18 @@ from app.models.tasks.task_model import Task
 from app.controller.base_controller import BaseController
 from app.controller.auth import authentication
 from pydantic import BaseModel
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException, Depends, Query
 from app.endpoints.base.base_router import BaseRouter
 from app.models.users.user import User
 from app.endpoints.base.pagination import PaginationResponse, PaginationInput
 from sqlmodel import select, func
+from enum import Enum
+
+
+class TaskStatus(str, Enum):
+    all = "all"
+    completed = "completed"
+    pending = "pending"
 
 
 class CreateTask(BaseModel):
@@ -22,6 +29,12 @@ class AnalyticsResponse(BaseModel):
     total_tasks: int
     completed_tasks: int
     pending_tasks: int
+
+
+class FilterTasks(BaseModel):
+    completed: TaskStatus | None = Query(
+        default=None, description="Filter by completion status"
+    )
 
 
 class TaskRouter(BaseRouter[Task, CreateTask]):
@@ -44,18 +57,31 @@ class TaskRouter(BaseRouter[Task, CreateTask]):
             description="Get task analytics",
             summary="Task Analytics",
         )
+        self.router.add_api_route(
+            "/search",
+            self.search,
+            methods=["GET"],
+            response_model=PaginationResponse[Task],
+            description="Search tasks by title",
+            summary="Search Tasks",
+        )
         return super().setup_routes()
 
     async def read_all(
         self,
         pagination: PaginationInput = Depends(),
         user: User = Depends(authentication.get_current_user),
+        filter: FilterTasks = Depends(),
     ) -> PaginationResponse[Task]:
         offset = (pagination.page - 1) * pagination.per_page
         query = select(self.model).where(self.model.user_id == user.id)
         total = self.controller.session.exec(
             select(func.count()).select_from(query)  # type: ignore
         ).one()
+        if filter.completed == TaskStatus.completed:
+            query = query.where(self.model.completed.is_(True))
+        elif filter.completed == TaskStatus.pending:
+            query = query.where(self.model.completed.is_(False))
         data = self.controller.session.exec(
             query.offset(offset).limit(pagination.per_page)
         ).all()
@@ -129,6 +155,36 @@ class TaskRouter(BaseRouter[Task, CreateTask]):
             total_tasks=total_tasks,
             completed_tasks=completed_tasks,
             pending_tasks=pending_tasks,
+        )
+
+    async def search(
+        self,
+        title: str,
+        user: User = Depends(authentication.get_current_user),
+        pagination: PaginationInput = Depends(),
+    ) -> PaginationResponse[Task]:
+        offset = (pagination.page - 1) * pagination.per_page
+        query = (
+            select(self.model)
+            .where(self.model.user_id == user.id)
+            .where(self.model.title.contains(title))
+        )
+        total = self.controller.session.exec(
+            select(func.count()).select_from(query)  # type: ignore
+        ).one()
+
+        data = self.controller.session.exec(
+            query.offset(offset).limit(pagination.per_page)
+        ).all()
+        return PaginationResponse[Task](
+            data=data,
+            total=total,
+            page=pagination.page,
+            per_page=pagination.per_page,
+            total_pages=(
+                total // pagination.per_page
+                + (1 if total % pagination.per_page > 0 else 0)
+            ),
         )
 
 
