@@ -52,7 +52,8 @@ main.py
    | Method | Path | Description |
    | ------ | --------------- | ------------------------------------------ |
    | GET | `tasks/analytics` | Get the total count of the tasks and the number of completed and pending tasks |
-   | GET | `tasks` | Get all my tasks |
+   | GET | `tasks/search` | Search for task by its title |
+   | GET | `tasks` | Get all my tasks & filter tasks base on there status |
    | POST | `tasks` | Create new Task |
    | PUT | `tasks\{id}` | Update task by its id |
    | DELETE | `tasks\{id}` | Delete the task by its id |
