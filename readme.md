@@ -83,6 +83,14 @@ pip install -r requirements.txt
 
 ---
 
+## 🔑 Run The App
+
+1. make sure you are inside the backend folder
+2. use `uvicorn app.main:app --reload`
+3. go to `127.0.0.1:8000/docs` to see the swagger docs
+
+---
+
 ## 🚀 Usage
 
 ### Example: Create a new controller and router for a model
