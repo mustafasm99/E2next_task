@@ -1,7 +1,6 @@
+# ⚡ FastAPI Restful API
 
-# ⚡ FastAPI Template with BaseController and BaseRouter
-
-This project is a clean and reusable **FastAPI template** that provides a solid foundation for building RESTful APIs using a controller-router pattern. It follows best practices for separation of concerns by abstracting database operations and API endpoint definitions into reusable base classes.
+This project is a clean and reusable **FastAPI Project** that provides a solid foundation for building RESTful APIs using a controller-router pattern. It follows best practices for separation of concerns by abstracting database operations and API endpoint definitions into reusable base classes.
 
 ---
 
@@ -27,7 +26,10 @@ app/
 ├── endpoints/
 │   └── base_router.py
 ├── models/
-│   └── your_models.py
+│   └── users/
+|   |   └── user.py
+|   └── task
+|       └── task_model.py
 ├── db/
 │   └── depend.py
 ├── core/
@@ -37,13 +39,33 @@ main.py
 
 ---
 
+## 📃 API Docs
+
+1. Auth Collections
+   | Method | Path | Description |
+   | ------ | --------------- | ------------------------------------------ |
+   | POST | `auth/login` | Login the user with user name and password |
+   | POST | `auth/register` | Create new user |
+   | Get | `auth/profile` | Get the current user by the token |
+
+2. Task Collections
+   | Method | Path | Description |
+   | ------ | --------------- | ------------------------------------------ |
+   | GET | `tasks/analytics` | Get the total count of the tasks and the number of completed and pending tasks |
+   | GET | `tasks` | Get all my tasks |
+   | POST | `tasks` | Create new Task |
+   | PUT | `tasks\{id}` | Update task by its id |
+   | DELETE | `tasks\{id}` | Delete the task by its id |
+
+---
+
 ## 📦 Installation
 
 1. Clone the repo
 
 ```bash
-git clone https://github.com/mustafasm99/fastapi_template.git
-cd fastapi_template
+git clone https://github.com/mustafasm99/E2next_task.git
+cd E2next_task
 ```
 
 2. Create and activate a virtual environment
@@ -125,13 +147,13 @@ All methods are asynchronous and interact with the database using SQLModel.
 
 Automatically registers CRUD endpoints:
 
-| Method | Path         | Description        |
-|--------|--------------|--------------------|
-| GET    | ``           | Get all items      |
-| GET    | `/{id}`      | Get item by ID     |
-| POST   | ``           | Create new item    |
-| PUT    | `/{id}`      | Update item by ID  |
-| DELETE | `/{id}`      | Delete item by ID  |
+| Method | Path    | Description       |
+| ------ | ------- | ----------------- |
+| GET    | ``      | Get all items     |
+| GET    | `/{id}` | Get item by ID    |
+| POST   | ``      | Create new item   |
+| PUT    | `/{id}` | Update item by ID |
+| DELETE | `/{id}` | Delete item by ID |
 
 ---
 
@@ -181,6 +203,6 @@ This project is licensed under the MIT License.
 
 ## 👨‍💻 Author
 
-**Your Name**  
+**Mustafa Saad**  
 GitHub: [@yourusername](https://github.com/mustafasm99)  
 LinkedIn: [Your LinkedIn](https://www.linkedin.com/in/mustafa-saad-5b154b109/)
